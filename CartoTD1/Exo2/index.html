@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Exo2 — Leaflet + Position</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    #map { height: 80vh; }
+    body { margin: 0; font-family: system-ui, Arial, sans-serif; }
+    .panel { padding: .75rem; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Leaflet — Position & Marqueurs</h1>
+    <div id="status">Recherche de position…</div>
+  </div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+  <script>
+    const map = L.map('map', { zoomControl: true });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    const nice = [43.7009, 7.2683];
+
+    function setStatus(msg) { document.getElementById('status').textContent = msg; }
+
+    function onLocate(pos) {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const acc = pos.coords.accuracy;
+
+      map.setView([lat, lon], 14);
+
+      L.marker([lat, lon]).addTo(map).bindPopup(`Moi ici<br>Précision: ${acc} m`).openPopup();
+      L.marker(nice).addTo(map).bindPopup('Nice — Centre');
+
+      const bermudes = [
+        [25.7617, -80.1918],  // Miami
+        [32.3078, -64.7505],  // Bermuda
+        [18.4655, -66.1057],  // San Juan
+      ];
+      L.polygon(bermudes, { color: 'red', weight: 2, fillOpacity: 0.1 }).addTo(map)
+        .bindPopup('Triangle des Bermudes');
+
+      setStatus(`Position: ${lat.toFixed(5)}, ${lon.toFixed(5)} (±${acc} m)`);
+    }
+
+    function onError(err) {
+      setStatus(`Erreur géoloc (${err.code}): ${err.message}`);
+      map.setView(nice, 12);
+    }
+
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(onLocate, onError, { enableHighAccuracy: true, timeout: 10000 });
+    } else {
+      onError({ code: -1, message: 'Géolocalisation non supportée' });
+    }
+  </script>
+</body>
+</html>
