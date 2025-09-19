@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Exo3 — Leaflet complet</title>
+  <title>Exo3 — Leaflet Plus</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link
     rel="stylesheet"
@@ -18,7 +18,7 @@
 </head>
 <body>
   <div class="panel">
-    <h1>Leaflet — Exo3 complet</h1>
+    <h1>Leaflet — Exo3</h1>
     <div id="status">Recherche de position…</div>
     <button id="btnRoute">Afficher trajet voiture</button>
   </div>
@@ -28,14 +28,17 @@
   <script>
     const map = L.map('map');
 
-    // Fond de carte OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    // Fond de carte Stamen Toner Lite
+    L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
+      attribution: 'Map tiles by Stamen Design, <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+      subdomains: 'abcd',
+      minZoom: 0,
+      maxZoom: 20
     }).addTo(map);
 
     const marseille = [43.2965, 5.3698];
-    let userLat, userLon; // pour réutiliser dans le bouton trajet
+    const nice = [43.7009, 7.2683];
+    let userLat, userLon;
 
     function setStatus(msg) {
       document.getElementById('status').textContent = msg;
@@ -46,30 +49,50 @@
       userLon = pos.coords.longitude;
       const acc = pos.coords.accuracy;
 
-      map.setView([userLat, userLon], 13);
+      map.setView([userLat, userLon], 10);
 
       // Marqueur position
       L.marker([userLat, userLon]).addTo(map)
         .bindPopup(`Moi ici<br>Précision: ${acc} m`).openPopup();
 
-      // Cercle de précision
+      // Cercle précision
       L.circle([userLat, userLon], { radius: acc, color: 'blue', fillOpacity: 0.1 }).addTo(map);
 
-      // Marqueur Marseille
+      // Marqueurs Marseille et Nice
       L.marker(marseille).addTo(map).bindPopup('Marseille');
+      L.marker(nice).addTo(map).bindPopup('Nice');
 
-      // Distance directe
+      // Segment Marseille ↔ Nice
+      L.polyline([marseille, nice], { color: 'orange', weight: 3 }).addTo(map)
+        .bindPopup('Marseille ↔ Nice');
+
+      // Distance Marseille ↔ ma position
       const dist = map.distance([userLat, userLon], marseille) / 1000;
       setStatus(`Position: ${userLat.toFixed(5)}, ${userLon.toFixed(5)} — Distance Marseille: ${dist.toFixed(2)} km`);
 
-      // Trait rouge direct
+      // Ligne rouge directe Marseille ↔ moi
       L.polyline([[userLat, userLon], marseille], { color: 'red', weight: 3 }).addTo(map)
-        .bindPopup('Ligne directe vers Marseille');
+        .bindPopup(`Distance directe: ${dist.toFixed(2)} km`);
+
+      // Charger un GeoJSON public (parcs et jardins de Nice)
+      fetch('https://opendata.nicecotedazur.org/data/amenagement/espaces_verts/espaces_verts.geojson')
+        .then(res => res.json())
+        .then(data => {
+          L.geoJSON(data, {
+            onEachFeature: (feature, layer) => {
+              if (feature.properties && feature.properties.nom) {
+                layer.bindPopup(`Parc/Jardin: ${feature.properties.nom}`);
+              }
+            },
+            style: { color: 'green', weight: 1, fillOpacity: 0.3 }
+          }).addTo(map);
+        })
+        .catch(err => console.error('Erreur chargement GeoJSON', err));
     }
 
     function onError(err) {
       setStatus(`Erreur géoloc (${err.code}): ${err.message}`);
-      map.setView(marseille, 10);
+      map.setView(marseille, 6);
     }
 
     // Bouton trajet voiture
