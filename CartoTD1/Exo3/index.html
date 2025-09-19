@@ -74,16 +74,11 @@
       L.polyline([[userLat, userLon], marseille], { color: 'red', weight: 3 }).addTo(map)
         .bindPopup(`Distance directe: ${dist.toFixed(2)} km`);
 
-      // Charger un GeoJSON public (parcs et jardins de Nice)
-      fetch('https://opendata.nicecotedazur.org/data/amenagement/espaces_verts/espaces_verts.geojson')
+      // Charger un GeoJSON public (exemple qui marche)
+      fetch('https://raw.githubusercontent.com/glynnbird/usstatesgeojson/master/california.geojson')
         .then(res => res.json())
         .then(data => {
           L.geoJSON(data, {
-            onEachFeature: (feature, layer) => {
-              if (feature.properties && feature.properties.nom) {
-                layer.bindPopup(`Parc/Jardin: ${feature.properties.nom}`);
-              }
-            },
             style: { color: 'green', weight: 1, fillOpacity: 0.3 }
           }).addTo(map);
         })
