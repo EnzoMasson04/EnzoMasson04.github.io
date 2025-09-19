@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Exo1 — Géolocalisation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 1rem; }
+    pre { background: #f6f8fa; padding: .75rem; border-radius: 6px; overflow:auto; }
+    .ok { color: #0a0; } .err { color: #b00; }
+  </style>
+</head>
+<body>
+  <h1>Géolocalisation (Exo1)</h1>
+  <p>Autorise la localisation dans le navigateur. Sur mobile: active GPS ou teste en Wi‑Fi/4G.</p>
+
+  <h2>getCurrentPosition</h2>
+  <pre id="once">En attente…</pre>
+
+  <h2>watchPosition</h2>
+  <pre id="watch">En attente…</pre>
+
+  <script>
+    function formatPosition(p) {
+      const { latitude, longitude, altitude, accuracy, altitudeAccuracy, heading, speed } = p.coords;
+      const ts = new Date(p.timestamp);
+      return [
+        `lat: ${latitude?.toFixed(6)}`,
+        `lon: ${longitude?.toFixed(6)}`,
+        `altitude: ${altitude ?? 'n/d'} m`,
+        `précision: ${accuracy} m`,
+        `précision alt: ${altitudeAccuracy ?? 'n/d'} m`,
+        `vitesse: ${speed ?? 'n/d'} m/s`,
+        `cap: ${heading ?? 'n/d'}°`,
+        `date: ${ts.toLocaleString()}`
+      ].join('\n');
+    }
+
+    function onError(err, targetId) {
+      document.getElementById(targetId).textContent = `Erreur (${err.code}): ${err.message}`;
+      document.getElementById(targetId).className = 'err';
+    }
+
+    if (!('geolocation' in navigator)) {
+      document.getElementById('once').textContent = 'Géolocalisation non supportée par ce navigateur.';
+      document.getElementById('watch').textContent = 'Géolocalisation non supportée par ce navigateur.';
+    } else {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const out = formatPosition(pos);
+          const el = document.getElementById('once');
+          el.textContent = out;
+          el.className = 'ok';
+        },
+        (err) => onError(err, 'once'),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+
+      navigator.geolocation.watchPosition(
+        (pos) => {
+          const out = formatPosition(pos);
+          const el = document.getElementById('watch');
+          el.textContent = out;
+          el.className = 'ok';
+        },
+        (err) => onError(err, 'watch'),
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+      );
+    }
+  </script>
+</body>
+</html>
