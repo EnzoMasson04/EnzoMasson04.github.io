@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TD2 - Ex1 (simple)</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Import map: permet d'écrire import 'three' sans config -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="hud"><strong>Ex1 – Cube minimal</strong></div>
+
+    <!-- Code principal -->
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
