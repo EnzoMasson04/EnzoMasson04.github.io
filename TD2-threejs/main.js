@@ -1,10 +1,3 @@
-// Ex1 (version simple et commentée)
-// ✔ Scène + caméra + lumières + renderer
-// ✔ Cube texturé (TextureLoader)
-// ✔ Modèle glTF (GLTFLoader) – DamagedHelmet
-// ✔ Animation via capteurs (DeviceOrientation) – bouton pour autoriser
-// ✔ Petit fog pour "autre chose"
-
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -36,15 +29,11 @@ dir.position.set(5, 10, 7);
 scene.add(dir);
 
 // —— Cube texturé (objet générique + texture) ——
-const tex = new THREE.TextureLoader().load(
-  'https://threejs.org/examples/textures/uv_grid_opengl.jpg'
-);
-tex.colorSpace = THREE.SRGBColorSpace;
-
+// Cube orange classique (sans texture)
 const cube = new THREE.Mesh(
   new THREE.BoxGeometry(1.8, 1.8, 1.8),
   new THREE.MeshStandardMaterial({
-    map: tex,
+    color: 0xffa500, // orange classique
     roughness: 0.5,
     metalness: 0.05
   })
