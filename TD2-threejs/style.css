@@ -12,7 +12,4 @@ html, body { height: 100%; margin: 0; }
   font-size: 14px;
 }
 
-#hud button {
-  margin-top: 6px;
-  cursor: pointer;
-}
+#hud button { margin-top: 6px; cursor: pointer; }
