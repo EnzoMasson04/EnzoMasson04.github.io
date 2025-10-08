@@ -3,255 +3,207 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ex.1 AVANCÉ – Globe 3D + Leaflet + Drapeaux</title>
+  <title>TD3 - Ex1 Part2 - Interactions Leaflet &lt;-&gt; Three.js</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
-    :root {
-      --card:#0b1220; --card2:#0f172a; --acc:#22d3ee; --txt:#e5e7eb;
-    }
-    html, body { margin:0; height:100%; background:#000; color:var(--txt); font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    #layout { display:grid; grid-template-columns: 1.1fr 0.9fr; height:100vh; }
-    #three { position:relative; overflow:hidden; }
-    #map { position:relative; }
-    #panel {
-      position:absolute; top:14px; left:14px; z-index:10;
-      background: linear-gradient(180deg, rgba(15,23,42,.9), rgba(2,6,23,.85));
-      border: 1px solid rgba(255,255,255,.08);
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      backdrop-filter: blur(6px);
-      border-radius:14px; padding:12px 14px; min-width: 260px;
-    }
-    #panel h3 { margin:0 0 8px 0; font-size:15px; letter-spacing:.3px; color:#8dd3ff; }
-    #panel .row { display:flex; gap:8px; flex-wrap:wrap; }
-    .btn {
-      background:#0ea5e9; border:none; color:#001018; font-weight:600;
-      padding:8px 10px; border-radius:10px; cursor:pointer;
-      transition:.15s transform ease, .2s opacity;
-    }
-    .btn.secondary { background:#1f2937; color:#e5e7eb; }
-    .btn:hover { transform: translateY(-1px); opacity:.95; }
+    html, body {height: 100%; margin: 0; background: #0b1020; color: #eaeff7; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;}
+    .grid {display: grid; grid-template-columns: 1fr 1fr; height: 100%;}
+    #three, #map {position: relative;}
+    #three canvas, #map {width: 100%; height: 100%;}
     #hud {
-      position:absolute; left:14px; bottom:14px; z-index:10; opacity:.9;
-      background: rgba(0,0,0,.55); padding:6px 10px; border-radius:10px; font-size:13px;
-      border: 1px solid rgba(255,255,255,.08);
+      position: absolute; left: 12px; top: 12px; z-index: 10;
+      background: rgba(0,0,0,.5); padding: 10px 12px; border-radius: 8px;
+      line-height: 1.35; font-size: 14px;
     }
-    #legend {
-      position:absolute; right:14px; top:14px; z-index:10; font-size:12px; opacity:.9;
-      background: rgba(0,0,0,.5); padding:8px 10px; border-radius:10px;
-      border: 1px solid rgba(255,255,255,.08);
+    #mapHud {
+      position: absolute; right: 12px; top: 12px; z-index: 10;
+      background: rgba(0,0,0,.55); padding: 10px 12px; border-radius: 8px;
+      line-height: 1.35; font-size: 14px;
     }
-    @media (max-width: 900px) {
-      #layout { grid-template-columns: 1fr; grid-template-rows: 55% 45%; }
+    a {color: #86c8ff;}
+    @media (max-width: 900px){
+      .grid {grid-template-columns: 1fr; grid-auto-rows: 50vh 50vh;}
     }
   </style>
+ 
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+      "three/examples/jsm/": "https://unpkg.com/three@0.159.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
-  <div id="layout">
+  <div class="grid">
     <div id="three">
-      <div id="panel">
-        <h3>Globe 3D – Interactions</h3>
-        <div class="row">
-          <button id="btnLoadCountries" class="btn">Charger des pays + drapeaux</button>
-          <button id="btnParis" class="btn secondary">Paris</button>
-          <button id="btnTokyo" class="btn secondary">Tokyo</button>
-          <button id="btnNYC" class="btn secondary">New York</button>
-        </div>
+      <div id="hud">
+        
       </div>
-      <div id="legend">Clic sur le globe = recadrer la carte</div>
-      <div id="hud">Prêt.</div>
     </div>
-    <div id="map"></div>
+    <div id="map">
+      <div id="mapHud">Carte Leaflet (OSM)</div>
+    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-  // ================== THREE – Scene ==================
-  const container = document.getElementById('three');
-  const hud = document.getElementById('hud');
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+    import L from 'https://cdn.skypack.dev/leaflet@1.9.4';
+ 
+    const threeRoot = document.getElementById('three');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, threeRoot.clientWidth / threeRoot.clientHeight, 0.1, 1000);
+    camera.position.set(0, 1.8, 3.2);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(threeRoot.clientWidth, threeRoot.clientHeight);
+    threeRoot.appendChild(renderer.domElement);
 
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
-  camera.position.set(0, 0.15, 3.2);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.85);
+    scene.add(ambient);
+    const dir = new THREE.DirectionalLight(0xffffff, 1);
+    dir.position.set(5, 3, 2);
+    scene.add(dir);
 
-  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
-  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-  container.appendChild(renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.minDistance = 1.6;
+    controls.maxDistance = 6;
+ 
+    const earthRadius = 1;
+    const earthGroup = new THREE.Group();
+    scene.add(earthGroup);
+    const earthGeo = new THREE.SphereGeometry(earthRadius, 64, 64);
+    const tex = await new THREE.TextureLoader().loadAsync('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+    const bump = await new THREE.TextureLoader().loadAsync('https://unpkg.com/three-globe/example/img/earth-topology.png');
+    const earthMat = new THREE.MeshPhongMaterial({ map: tex, bumpMap: bump, bumpScale: 0.02, specular: 0x222222, shininess: 12 });
+    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    earthGroup.add(earthMesh);
 
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.enablePan = false;
-  controls.minDistance = 2.2;
-  controls.maxDistance = 6;
+    const atmo = new THREE.Mesh(new THREE.SphereGeometry(earthRadius*1.02, 64, 64), new THREE.MeshBasicMaterial({color:0x99bbff, transparent:true, opacity:0.12, side:THREE.BackSide}));
+    earthGroup.add(atmo);
 
-  // Lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-  const dir = new THREE.DirectionalLight(0xffffff, 1.0);
-  dir.position.set(4, 2.5, 1.5);
-  scene.add(dir);
-
-  // Earth with texture (fallback safe color if blocked)
-  const earthRadius = 1;
-  const sphereGeo = new THREE.SphereGeometry(earthRadius, 64, 64);
-  const loader = new THREE.TextureLoader();
-  const earth = new THREE.Mesh(sphereGeo, new THREE.MeshStandardMaterial({ color:0x1d3a63 }));
-  scene.add(earth);
-
-  // try to load texture (CORS ok on threejs.org)
-  loader.load(
-    "https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg",
-    (tx)=>{ earth.material.map = tx; earth.material.needsUpdate = true; },
-    undefined,
-    ()=>{ /* keep solid color */ }
-  );
-
-  // Subtle atmosphere glow (cheap)
-  const atmGeo = new THREE.SphereGeometry(earthRadius*1.03, 48, 48);
-  const atmMat = new THREE.MeshBasicMaterial({ color:0x8dd3ff, transparent:true, opacity:0.08, blending:THREE.AdditiveBlending });
-  const atmosphere = new THREE.Mesh(atmGeo, atmMat);
-  scene.add(atmosphere);
-
-  // ========== Helpers lat/lon <-> xyz ==========
-  function latLonToXYZ(lat, lon, r=earthRadius){
-    const phi = (90 - lat) * Math.PI/180;
-    const theta = (lon + 180) * Math.PI/180;
-    const x = -r * Math.sin(phi) * Math.cos(theta);
-    const z =  r * Math.sin(phi) * Math.sin(theta);
-    const y =  r * Math.cos(phi);
-    return new THREE.Vector3(x,y,z);
-  }
-  function xyzToLatLon(v){
-    const r = v.length();
-    const phi = Math.acos(THREE.MathUtils.clamp(v.y/r, -1, 1));
-    const theta = Math.atan2(v.z, -v.x);
-    const lat = 90 - THREE.MathUtils.radToDeg(phi);
-    const lon = THREE.MathUtils.radToDeg(theta) - 180;
-    return {lat, lon: ((lon+180)%360+360)%360-180};
-  }
-
-  // Markers
-  function addDot(lat, lon, color=0xff5533, size=0.02){
-    const m = new THREE.Mesh(new THREE.SphereGeometry(size, 12, 12),
-                             new THREE.MeshStandardMaterial({color}));
-    m.position.copy(latLonToXYZ(lat, lon, earthRadius + size*1.5));
-    scene.add(m);
-    return m;
-  }
-
-  // Sprite flags
-  const textureLoader = new THREE.TextureLoader();
-  function addFlag(lat, lon, flagUrl, label="", scale=0.26){
-    const pos = latLonToXYZ(lat, lon, earthRadius + 0.02);
-    const tex = textureLoader.load(flagUrl, undefined, undefined, ()=>{});
-    const mat = new THREE.SpriteMaterial({ map: tex, depthTest:true });
-    const sprite = new THREE.Sprite(mat);
-    sprite.position.copy(pos);
-    sprite.scale.set(scale, scale*0.66, 1);
-    scene.add(sprite);
-    sprite.userData.type = "flag";
-    sprite.userData.lat = lat; sprite.userData.lon = lon; sprite.userData.label = label;
-    return sprite;
-  }
-
-  // User geoloc (optional)
-  if('geolocation' in navigator){
-    navigator.geolocation.getCurrentPosition(
-      (pos)=>{
-        const {latitude, longitude} = pos.coords;
-        addDot(latitude, longitude, 0x00ff88, 0.03);
-        hud.textContent = `Ma position: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-      },
-      ()=>{},
-      { enableHighAccuracy:true, timeout:8000 }
-    );
-  }
-
-  // ================== Leaflet ==================
-  const map = L.map('map').setView([48.8566, 2.3522], 3);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OpenStreetMap'}).addTo(map);
-
-  // Map -> 3D : click to face
-  function faceLatLon(lat, lon, speed=0.06){
-    // target rotations
-    const targetY = THREE.MathUtils.degToRad(lon);
-    const targetX = THREE.MathUtils.degToRad(-lat);
-    rotTarget.y = targetY;
-    rotTarget.x = targetX;
-    rotSpeed = speed;
-  }
-  map.on('click', (e)=>{
-    faceLatLon(e.latlng.lat, e.latlng.lng);
-    hud.textContent = `Carte: lat=${e.latlng.lat.toFixed(3)}, lon=${e.latlng.lng.toFixed(3)}`;
-  });
-
-  // 3D -> Map : raycast earth OR flag
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
-  renderer.domElement.addEventListener('click', (ev)=>{
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(scene.children, true);
-    if(!intersects.length) return;
-    let i = intersects.find(h=>h.object === earth) || intersects[0];
-    if(i.object.userData.type === "flag"){
-      map.setView([i.object.userData.lat, i.object.userData.lon], Math.max(map.getZoom(), 4));
-      hud.textContent = `Drapeau: ${i.object.userData.label}`;
-      return;
+    const deg2rad = d => d * Math.PI / 180;
+    function latLonToVector3(latDeg, lonDeg, radius = earthRadius, altitude = 0) {
+      const lat = deg2rad(latDeg), lon = deg2rad(lonDeg);
+      const r = radius + altitude;
+      const x = r * Math.cos(lat) * Math.cos(lon);
+      const y = r * Math.sin(lat);
+      const z = r * Math.cos(lat) * Math.sin(lon);
+      return new THREE.Vector3(x, y, z);
     }
-    if(i.object === earth){
-      const p = i.point.clone().normalize().multiplyScalar(earthRadius);
-      const {lat, lon} = xyzToLatLon(p);
-      map.setView([lat, lon], Math.max(map.getZoom(), 4));
-      hud.textContent = `Globe: lat=${lat.toFixed(3)}, lon=${lon.toFixed(3)}`;
+    function cartesianToLatLon(v) {
+      const r = Math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+      const lat = Math.asin(v.y / r) * 180 / Math.PI;
+      const lon = Math.atan2(v.z, v.x) * 180 / Math.PI;
+      return { lat, lon };
     }
-  });
 
-  // Buttons
-  document.getElementById('btnParis').onclick = ()=>faceLatLon(48.8566, 2.3522);
-  document.getElementById('btnTokyo').onclick = ()=>faceLatLon(35.6762, 139.6503);
-  document.getElementById('btnNYC').onclick = ()=>faceLatLon(40.7128, -74.0060);
-
-  document.getElementById('btnLoadCountries').onclick = async ()=>{
-    hud.textContent = "Chargement des pays...";
-    try{
-      const res = await fetch('https://restcountries.com/v3.1/all');
-      const arr = await res.json();
-      const picks = ["France","United States","Japan","Brazil","Morocco","Australia","India","Canada","Argentina","South Africa","Egypt","Spain","Italy","Germany"];
-      arr.filter(c=>c.name && picks.includes(c.name.common)).forEach(c=>{
-        const latlng = c.latlng || [0,0];
-        const flag = (c.flags && (c.flags.png || c.flags.svg)) || null;
-        if(flag) addFlag(latlng[0], latlng[1], flag, c.name.common);
+    function makeDot(color = 0xff3333, scale = 0.03) {
+      return new THREE.Mesh(new THREE.SphereGeometry(scale, 16, 16), new THREE.MeshBasicMaterial({color}));
+    }
+    const texLoader = new THREE.TextureLoader(); texLoader.setCrossOrigin('anonymous');
+    function makeFlagSprite(urlPng, size = 0.14) {
+      const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: texLoader.load(urlPng), depthTest: true, depthWrite:false }));
+      s.scale.set(size*1.6, size, 1);
+      return s;
+    }
+ 
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const { latitude, longitude } = pos.coords;
+        const dot = makeDot(0xff4444, 0.03);
+        dot.position.copy(latLonToVector3(latitude, longitude, earthRadius, 0.02));
+        earthGroup.add(dot);
       });
-      hud.textContent = "Pays + drapeaux ajoutés.";
-    }catch(e){
-      hud.textContent = "Échec API pays (offline/CORS). On reste en mode simple.";
     }
-  };
+ 
+    const flagSprites = [];
+    async function addCountryFlags(limit = 60) {
+      try {
+        const resp = await fetch('https://restcountries.com/v3.1/all?fields=name,latlng,cca2,flags');
+        const countries = await resp.json();
+        let c = 0;
+        for (const ct of countries) {
+          if (!ct.latlng || ct.latlng.length < 2 || !ct.flags?.png) continue;
+          const [lat, lon] = ct.latlng;
+          const s = makeFlagSprite(ct.flags.png, 0.08);
+          s.position.copy(latLonToVector3(lat, lon, earthRadius, 0.03));
+          s.userData = { country: ct.name?.common || ct.cca2, lat, lon };
+          earthGroup.add(s);
+          flagSprites.push(s);
+          if (++c >= limit) break;
+        }
+      } catch(e) { console.warn('restcountries fail', e); }
+    }
+    addCountryFlags();
+ 
+    function pointToFront(lat, lon) {
+      const target = latLonToVector3(lat, lon).normalize();
+      const front = new THREE.Vector3(0,0,1);
+      const q = new THREE.Quaternion().setFromUnitVectors(target, front);
+      earthGroup.quaternion.copy(q);
+      autoRotate = false;
+    }
+ 
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    function onThreeClick(evt) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((evt.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((evt.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+   
+      let isFlag = raycaster.intersectObjects(flagSprites, true)[0];
+      if (isFlag) {
+        const { lat, lon } = isFlag.object.userData;
+        map.setView([lat, lon], 4);
+        pointToFront(lat, lon);
+        return;
+      } 
+      let hit = raycaster.intersectObject(earthMesh, true)[0];
+      if (hit) {
+        const r = hit.point.length();
+        const lat = Math.asin(hit.point.y / r) * 180 / Math.PI;
+        const lon = Math.atan2(hit.point.z, hit.point.x) * 180 / Math.PI;
+        map.setView([lat, lon], 4);
+        pointToFront(lat, lon);
+      }
+    }
+    renderer.domElement.addEventListener('pointerdown', onThreeClick);
+ 
+    let autoRotate = true;
+    function animate() {
+      requestAnimationFrame(animate);
+      if (autoRotate) earthGroup.rotation.y += 0.0012;
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
 
-  // Resize & Animate
-  function onResize(){
-    const w = container.clientWidth, h = container.clientHeight;
-    renderer.setSize(w,h,false);
-    camera.aspect = w/h; camera.updateProjectionMatrix();
-  }
-  window.addEventListener('resize', onResize); onResize();
+    function resizeThree() {
+      const w = threeRoot.clientWidth, h = threeRoot.clientHeight;
+      camera.aspect = w/h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
+    }
+ 
+    const mapRoot = document.getElementById('map');
+    const map = L.map(mapRoot).setView([48.8566, 2.3522], 3);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19, attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
 
-  const rotTarget = {x:0,y:0}; let rotSpeed = 0.04;
-  function animate(){
-    requestAnimationFrame(animate);
-    controls.update();
-    // gentle auto-rotate
-    earth.rotation.y += 0.0008;
-    atmosphere.rotation.y = earth.rotation.y * 1.03;
-    // ease to target
-    earth.rotation.y += (rotTarget.y - earth.rotation.y) * rotSpeed;
-    earth.rotation.x += (rotTarget.x - earth.rotation.x) * rotSpeed;
-    renderer.render(scene, camera);
-  }
-  renderer.setAnimationLoop(animate);
+    map.on('click', (e) => {
+      const { lat, lng } = e.latlng;
+      pointToFront(lat, lng);
+    });
+ 
+    window.addEventListener('resize', () => {
+      resizeThree();
+      map.invalidateSize();
+    });
   </script>
 </body>
 </html>
