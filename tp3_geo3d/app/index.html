@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ex.1 – Globe 3D + Leaflet (Three.js)</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    #layout { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 100%; height: 100vh; }
+    #threeContainer { position: relative; background: #000; }
+    #map { width: 100%; height: 100%; }
+    #hud {
+      position: absolute; left: 10px; top: 10px; z-index: 10;
+      background: rgba(0,0,0,0.6); color: #fff; padding: 8px 10px; border-radius: 8px;
+      font-size: 14px; line-height: 1.3;
+    }
+    #controls {
+      position: absolute; right: 10px; top: 10px; z-index: 10;
+      background: rgba(0,0,0,0.6); color: #fff; padding: 8px 10px; border-radius: 8px;
+      font-size: 13px; max-width: 280px;
+    }
+    #controls button { margin: 4px 0; width: 100%; }
+    @media (max-width: 900px) {
+      #layout { grid-template-columns: 1fr; grid-template-rows: 50% 50%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="layout">
+    <div id="threeContainer">
+      <div id="hud">Terre 3D – clic sur globe = recadre la carte</div>
+      <div id="controls">
+        <div><b>Interactions</b></div>
+        <button id="btnAddCountries">Ajouter quelques pays + drapeaux</button>
+        <button id="btnGotoParis">Aller à Paris</button>
+        <button id="btnGotoTokyo">Aller à Tokyo</button>
+        <div id="status" style="margin-top:6px; opacity:.9;"></div>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="./main.js"></script>
+</body>
+</html>

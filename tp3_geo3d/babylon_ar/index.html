@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Ex.2 – Babylon.js AR géolocalisée</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <style>
+    html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+    #renderCanvas { width: 100%; height: 100%; touch-action: none; }
+    #info {
+      position: absolute; bottom: 10px; left: 10px; color: white;
+      background-color: rgba(0,0,0,0.7); padding: 10px; border-radius: 6px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; font-size: 14px;
+      max-width: 70vw;
+    }
+    #iosBtn { position: absolute; top: 10px; right: 10px; z-index: 10; }
+  </style>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+</head>
+<body>
+  <button id="iosBtn" style="display:none;">Activer capteurs iOS</button>
+  <div id="info">Initialisation...</div>
+  <canvas id="renderCanvas"></canvas>
+
+  <script>
+  const canvas = document.getElementById('renderCanvas');
+  const engine = new BABYLON.Engine(canvas, true);
+  const infoDiv = document.getElementById('info');
+  const iosBtn = document.getElementById('iosBtn');
+
+  // iOS permission for sensors
+  if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+    iosBtn.style.display = "block";
+    iosBtn.onclick = async () => {
+      try {
+        await DeviceOrientationEvent.requestPermission();
+        iosBtn.remove();
+      } catch(e) {
+        alert("Permission capteurs refusée : " + e);
+      }
+    };
+  }
+
+  // --- Params ---
+  const distance = 30;
+  const cubeSize = 2;
+  const smoothingFactor = 0.06;
+
+  // Orientation smoothing
+  let targetAngleY = 0;
+  let smoothedAngleY = 0;
+
+  const createScene = () => {
+    const scene = new BABYLON.Scene(engine);
+    const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+    const camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0, 1.7, 0), scene);
+    scene.activeCamera = camera;
+
+    // Cardinal cubes
+    const addCardinal = (name, pos, color) => {
+      const box = BABYLON.MeshBuilder.CreateBox(name, { size: cubeSize }, scene);
+      box.position = pos;
+      const mat = new BABYLON.StandardMaterial(name+"_mat", scene);
+      mat.emissiveColor = color;
+      box.material = mat;
+      return box;
+    };
+    addCardinal("Nord",  new BABYLON.Vector3(0, 0, distance),   new BABYLON.Color3(1, 0, 0));
+    addCardinal("Est",   new BABYLON.Vector3(distance, 0, 0),   new BABYLON.Color3(0, 1, 0));
+    addCardinal("Sud",   new BABYLON.Vector3(0, 0, -distance),  new BABYLON.Color3(0, 0, 1));
+    addCardinal("Ouest", new BABYLON.Vector3(-distance, 0, 0),  new BABYLON.Color3(1, 1, 0));
+
+    setupARBackground(scene);
+    setupOrientationListener();
+    setupGeolocation(scene);
+    return scene;
+  };
+
+  function setupARBackground(scene) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => {
+        const video = document.createElement('video');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('autoplay', '');
+        video.srcObject = stream;
+        video.play();
+        const background = new BABYLON.Layer("background", null, scene, true);
+        background.texture = new BABYLON.VideoTexture("video", video, scene, true);
+      })
+      .catch(err => {
+        infoDiv.innerHTML = "<strong>Erreur:</strong> Caméra inaccessible. Utilise <strong>HTTPS</strong> (ou localhost).";
+      });
+  }
+
+  function setupOrientationListener() {
+    window.addEventListener("deviceorientationabsolute", (event) => {
+      if (event.alpha !== null) {
+        const screenAngle = (screen.orientation && screen.orientation.angle) ? screen.orientation.angle : 0;
+        const compensatedAlpha = event.alpha - screenAngle;
+        targetAngleY = -compensatedAlpha;
+        infoDiv.textContent = `Cap: ${(compensatedAlpha % 360).toFixed(1)}°`;
+      }
+    }, true);
+  }
+
+  // --- Geolocation + ENU placement ---
+  let userLat = null, userLon = null;
+  let userReady = false;
+  let meMarker = null;
+
+  function setupGeolocation(scene) {
+    if (!("geolocation" in navigator)) {
+      infoDiv.textContent = "Géolocalisation non disponible.";
+      return;
+    }
+    navigator.geolocation.watchPosition((pos) => {
+      userLat = pos.coords.latitude;
+      userLon = pos.coords.longitude;
+      userReady = true;
+      if (!meMarker) {
+        meMarker = BABYLON.MeshBuilder.CreateSphere("me", { diameter: 2 }, scene);
+        const mat = new BABYLON.StandardMaterial("meMat", scene);
+        mat.emissiveColor = new BABYLON.Color3(1, 0.4, 0.2);
+        meMarker.material = mat;
+        meMarker.position.set(0, 0, 0);
+      }
+      infoDiv.textContent = `Moi: ${userLat.toFixed(5)}, ${userLon.toFixed(5)} | ` + infoDiv.textContent;
+    }, (err) => {
+      infoDiv.textContent = "Géoloc refusée/indisponible : " + err.message;
+    }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
+
+    // Add sample POIs when ready
+    scene.onBeforeRenderObservable.add(() => {
+      if (userReady && !scene._poiAdded) {
+        addPOI(scene, "Tour Eiffel", 48.858370, 2.294481);
+        addPOI(scene, "Place Masséna", 43.7006, 7.2707);
+        addPOI(scene, "Tokyo", 35.6762, 139.6503);
+        scene._poiAdded = true;
+      }
+    });
+  }
+
+  function llToLocalENU(lat, lon, refLat, refLon) {
+    const R = 6371000.0;
+    const dLat = (lat - refLat) * Math.PI / 180;
+    const dLon = (lon - refLon) * Math.PI / 180;
+    const meanLat = (lat + refLat) * 0.5 * Math.PI / 180;
+    const xEast  = R * dLon * Math.cos(meanLat);
+    const zNorth = R * dLat;
+    return new BABYLON.Vector3(xEast, 0, zNorth);
+  }
+
+  function addPOI(scene, name, lat, lon) {
+    if (!userReady) return null;
+    const posLocal = llToLocalENU(lat, lon, userLat, userLon);
+    const poi = BABYLON.MeshBuilder.CreateBox(name, { size: 2.5 }, scene);
+    const mat = new BABYLON.StandardMaterial(name+"_mat", scene);
+    mat.emissiveColor = BABYLON.Color3.Random();
+    poi.material = mat;
+    poi.position = posLocal;
+
+    const plane = BABYLON.MeshBuilder.CreatePlane(name + "_label", { size: 6 }, scene);
+    plane.position = posLocal.add(new BABYLON.Vector3(0, 4.5, 0));
+    const dt = new BABYLON.DynamicTexture(name + "_dt", { width: 512, height: 128 }, scene, true);
+    dt.drawText(name, 20, 90, "bold 72px Arial", "white", "transparent");
+    const pm = new BABYLON.StandardMaterial(name + "_pm", scene);
+    pm.emissiveTexture = dt;
+    pm.disableLighting = true;
+    plane.material = pm;
+    plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+    return poi;
+  }
+
+  const scene = createScene();
+
+  engine.runRenderLoop(() => {
+    let delta = targetAngleY - smoothedAngleY;
+    if (Math.abs(delta) > 180) delta -= Math.sign(delta) * 360;
+    smoothedAngleY += delta * smoothingFactor;
+    scene.activeCamera.rotation.y = BABYLON.Tools.ToRadians(smoothedAngleY);
+    scene.render();
+  });
+
+  window.addEventListener('resize', () => engine.resize());
+  </script>
+</body>
+</html>
