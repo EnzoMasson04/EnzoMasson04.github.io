@@ -1,0 +1,418 @@
+{
+  "hash": "f19929ae",
+  "configHash": "ecf8dc57",
+  "lockfileHash": "b23bf38b",
+  "browserHash": "b888e3d8",
+  "optimized": {
+    "@babylonjs/core/Cameras/freeCamera": {
+      "src": "../../node_modules/@babylonjs/core/Cameras/freeCamera.js",
+      "file": "@babylonjs_core_Cameras_freeCamera.js",
+      "fileHash": "f4349c11",
+      "needsInterop": false
+    },
+    "@babylonjs/core/Engines/engine": {
+      "src": "../../node_modules/@babylonjs/core/Engines/engine.js",
+      "file": "@babylonjs_core_Engines_engine.js",
+      "fileHash": "feb05d38",
+      "needsInterop": false
+    },
+    "@babylonjs/core/Layers/glowLayer": {
+      "src": "../../node_modules/@babylonjs/core/Layers/glowLayer.js",
+      "file": "@babylonjs_core_Layers_glowLayer.js",
+      "fileHash": "c9366746",
+      "needsInterop": false
+    },
+    "@babylonjs/core/Lights/directionalLight": {
+      "src": "../../node_modules/@babylonjs/core/Lights/directionalLight.js",
+      "file": "@babylonjs_core_Lights_directionalLight.js",
+      "fileHash": "cf764440",
+      "needsInterop": false
+    },
+    "@babylonjs/core/Lights/hemisphericLight": {
+      "src": "../../node_modules/@babylonjs/core/Lights/hemisphericLight.js",
+      "file": "@babylonjs_core_Lights_hemisphericLight.js",
+      "fileHash": "6554a966",
+      "needsInterop": false
+    },
+    "@babylonjs/core/Materials/standardMaterial": {
+      "src": "../../node_modules/@babylonjs/core/Materials/standardMaterial.js",
+      "file": "@babylonjs_core_Materials_standardMaterial.js",
+      "fileHash": "70c11184",
+      "needsInterop": false
+    },
+    "@babylonjs/core/Maths/math.color": {
+      "src": "../../node_modules/@babylonjs/core/Maths/math.color.js",
+      "file": "@babylonjs_core_Maths_math__color.js",
+      "fileHash": "372ac600",
+      "needsInterop": false
+    },
+    "@babylonjs/core/Maths/math.vector": {
+      "src": "../../node_modules/@babylonjs/core/Maths/math.vector.js",
+      "file": "@babylonjs_core_Maths_math__vector.js",
+      "fileHash": "c02146c7",
+      "needsInterop": false
+    },
+    "@babylonjs/core/Meshes/meshBuilder": {
+      "src": "../../node_modules/@babylonjs/core/Meshes/meshBuilder.js",
+      "file": "@babylonjs_core_Meshes_meshBuilder.js",
+      "fileHash": "cc9cf66b",
+      "needsInterop": false
+    },
+    "@babylonjs/core/scene": {
+      "src": "../../node_modules/@babylonjs/core/scene.js",
+      "file": "@babylonjs_core_scene.js",
+      "fileHash": "b9786b2c",
+      "needsInterop": false
+    },
+    "@babylonjs/gui/2D": {
+      "src": "../../node_modules/@babylonjs/gui/2D/index.js",
+      "file": "@babylonjs_gui_2D.js",
+      "fileHash": "c474399f",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "layer.fragment-P4IF27X2": {
+      "file": "layer__fragment-P4IF27X2.js"
+    },
+    "layer.vertex-LOB3YGP3": {
+      "file": "layer__vertex-LOB3YGP3.js"
+    },
+    "layer.fragment-Q7OZBDQI": {
+      "file": "layer__fragment-Q7OZBDQI.js"
+    },
+    "default.vertex-PIL54HJF": {
+      "file": "default__vertex-PIL54HJF.js"
+    },
+    "default.fragment-NVQL6J4P": {
+      "file": "default__fragment-NVQL6J4P.js"
+    },
+    "chunk-XDVPFPEP": {
+      "file": "chunk-XDVPFPEP.js"
+    },
+    "default.vertex-SKSITIXW": {
+      "file": "default__vertex-SKSITIXW.js"
+    },
+    "default.fragment-HQQJ7AKV": {
+      "file": "default__fragment-HQQJ7AKV.js"
+    },
+    "chunk-C6D2VEIP": {
+      "file": "chunk-C6D2VEIP.js"
+    },
+    "glowMapGeneration.fragment-7E5AO5PO": {
+      "file": "glowMapGeneration__fragment-7E5AO5PO.js"
+    },
+    "glowMapGeneration.vertex-W7GBUFII": {
+      "file": "glowMapGeneration__vertex-W7GBUFII.js"
+    },
+    "chunk-YD446R7F": {
+      "file": "chunk-YD446R7F.js"
+    },
+    "glowMapGeneration.fragment-BFYS4QXA": {
+      "file": "glowMapGeneration__fragment-BFYS4QXA.js"
+    },
+    "glowMapMerge.fragment-WHQHJYD7": {
+      "file": "glowMapMerge__fragment-WHQHJYD7.js"
+    },
+    "glowMapMerge.vertex-VEDYCOII": {
+      "file": "glowMapMerge__vertex-VEDYCOII.js"
+    },
+    "glowMapMerge.fragment-4GA3IB2A": {
+      "file": "glowMapMerge__fragment-4GA3IB2A.js"
+    },
+    "glowMapMerge.vertex-2CM7C2G2": {
+      "file": "glowMapMerge__vertex-2CM7C2G2.js"
+    },
+    "layer.vertex-QAVTU6AS": {
+      "file": "layer__vertex-QAVTU6AS.js"
+    },
+    "color.fragment-2XXKIP26": {
+      "file": "color__fragment-2XXKIP26.js"
+    },
+    "chunk-PQPIVRDB": {
+      "file": "chunk-PQPIVRDB.js"
+    },
+    "chunk-H6PTG76E": {
+      "file": "chunk-H6PTG76E.js"
+    },
+    "kernelBlur.fragment-XO6COEWG": {
+      "file": "kernelBlur__fragment-XO6COEWG.js"
+    },
+    "kernelBlur.vertex-SOZIUMQM": {
+      "file": "kernelBlur__vertex-SOZIUMQM.js"
+    },
+    "chunk-Q5WDHPO7": {
+      "file": "chunk-Q5WDHPO7.js"
+    },
+    "kernelBlur.fragment-R6S7P2FD": {
+      "file": "kernelBlur__fragment-R6S7P2FD.js"
+    },
+    "kernelBlur.vertex-NBUXWCZK": {
+      "file": "kernelBlur__vertex-NBUXWCZK.js"
+    },
+    "chunk-BYU6K6J3": {
+      "file": "chunk-BYU6K6J3.js"
+    },
+    "glowBlurPostProcess.fragment-SVFRMKHB": {
+      "file": "glowBlurPostProcess__fragment-SVFRMKHB.js"
+    },
+    "glowBlurPostProcess.fragment-CWBFFUSL": {
+      "file": "glowBlurPostProcess__fragment-CWBFFUSL.js"
+    },
+    "glowMapGeneration.vertex-ELAW4OED": {
+      "file": "glowMapGeneration__vertex-ELAW4OED.js"
+    },
+    "chunk-4CMMXGI5": {
+      "file": "chunk-4CMMXGI5.js"
+    },
+    "hdrTextureLoader-MKL4BFBG": {
+      "file": "hdrTextureLoader-MKL4BFBG.js"
+    },
+    "ktxTextureLoader-22ODDLO6": {
+      "file": "ktxTextureLoader-22ODDLO6.js"
+    },
+    "tgaTextureLoader-QV4M4RBA": {
+      "file": "tgaTextureLoader-QV4M4RBA.js"
+    },
+    "exrTextureLoader-U4U6ZC3Q": {
+      "file": "exrTextureLoader-U4U6ZC3Q.js"
+    },
+    "mesh.vertexData.functions-XYV54OVI": {
+      "file": "mesh__vertexData__functions-XYV54OVI.js"
+    },
+    "color.vertex-IAPQIB46": {
+      "file": "color__vertex-IAPQIB46.js"
+    },
+    "chunk-X6Z3OFWX": {
+      "file": "chunk-X6Z3OFWX.js"
+    },
+    "chunk-3S6JEMWV": {
+      "file": "chunk-3S6JEMWV.js"
+    },
+    "color.fragment-XC47MZCP": {
+      "file": "color__fragment-XC47MZCP.js"
+    },
+    "chunk-QTCGPMQF": {
+      "file": "chunk-QTCGPMQF.js"
+    },
+    "chunk-DAXVN4UC": {
+      "file": "chunk-DAXVN4UC.js"
+    },
+    "color.vertex-6L4LQGL6": {
+      "file": "color__vertex-6L4LQGL6.js"
+    },
+    "chunk-7OHQEJQW": {
+      "file": "chunk-7OHQEJQW.js"
+    },
+    "chunk-5SBM7CTA": {
+      "file": "chunk-5SBM7CTA.js"
+    },
+    "dds-T2BW3E4K": {
+      "file": "dds-T2BW3E4K.js"
+    },
+    "ddsTextureLoader-B3XFXY6C": {
+      "file": "ddsTextureLoader-B3XFXY6C.js"
+    },
+    "chunk-ERMR6VT4": {
+      "file": "chunk-ERMR6VT4.js"
+    },
+    "basisTextureLoader-3NQ32VRJ": {
+      "file": "basisTextureLoader-3NQ32VRJ.js"
+    },
+    "rgbdDecode.fragment-7BIIQDJI": {
+      "file": "rgbdDecode__fragment-7BIIQDJI.js"
+    },
+    "rgbdDecode.fragment-S2A24YYR": {
+      "file": "rgbdDecode__fragment-S2A24YYR.js"
+    },
+    "rgbdEncode.fragment-JSWX6A22": {
+      "file": "rgbdEncode__fragment-JSWX6A22.js"
+    },
+    "chunk-WPMTIE6R": {
+      "file": "chunk-WPMTIE6R.js"
+    },
+    "rgbdEncode.fragment-UO5TCRJI": {
+      "file": "rgbdEncode__fragment-UO5TCRJI.js"
+    },
+    "chunk-V76IVFKE": {
+      "file": "chunk-V76IVFKE.js"
+    },
+    "envTextureLoader-R3AWQD4T": {
+      "file": "envTextureLoader-R3AWQD4T.js"
+    },
+    "chunk-J4YISJJI": {
+      "file": "chunk-J4YISJJI.js"
+    },
+    "dumpTools-5JSX45XP": {
+      "file": "dumpTools-5JSX45XP.js"
+    },
+    "chunk-RTVWLEG2": {
+      "file": "chunk-RTVWLEG2.js"
+    },
+    "pass.fragment-II5LJKLQ": {
+      "file": "pass__fragment-II5LJKLQ.js"
+    },
+    "passCube.fragment-2ZQ52LZV": {
+      "file": "passCube__fragment-2ZQ52LZV.js"
+    },
+    "passCube.fragment-LRO3VWLP": {
+      "file": "passCube__fragment-LRO3VWLP.js"
+    },
+    "lodCube.fragment-RJ3L3HTX": {
+      "file": "lodCube__fragment-RJ3L3HTX.js"
+    },
+    "lod.fragment-EMDDEZF5": {
+      "file": "lod__fragment-EMDDEZF5.js"
+    },
+    "lodCube.fragment-FRZYU2R7": {
+      "file": "lodCube__fragment-FRZYU2R7.js"
+    },
+    "lod.fragment-IOTIBIMS": {
+      "file": "lod__fragment-IOTIBIMS.js"
+    },
+    "iesTextureLoader-SGHYB2WX": {
+      "file": "iesTextureLoader-SGHYB2WX.js"
+    },
+    "postprocess.vertex-XITIJGIP": {
+      "file": "postprocess__vertex-XITIJGIP.js"
+    },
+    "postprocess.vertex-A3CAM3YB": {
+      "file": "postprocess__vertex-A3CAM3YB.js"
+    },
+    "thinEngine-7DYNNXPM": {
+      "file": "thinEngine-7DYNNXPM.js"
+    },
+    "pass.fragment-TUN7DJIZ": {
+      "file": "pass__fragment-TUN7DJIZ.js"
+    },
+    "chunk-44DNM2GM": {
+      "file": "chunk-44DNM2GM.js"
+    },
+    "chunk-ASZ2EMQJ": {
+      "file": "chunk-ASZ2EMQJ.js"
+    },
+    "chunk-PKTWLCMT": {
+      "file": "chunk-PKTWLCMT.js"
+    },
+    "chunk-3Z776HTZ": {
+      "file": "chunk-3Z776HTZ.js"
+    },
+    "chunk-LUCTKE24": {
+      "file": "chunk-LUCTKE24.js"
+    },
+    "chunk-6E4JMI5F": {
+      "file": "chunk-6E4JMI5F.js"
+    },
+    "chunk-3RLAZYYX": {
+      "file": "chunk-3RLAZYYX.js"
+    },
+    "chunk-Z4VNN5BC": {
+      "file": "chunk-Z4VNN5BC.js"
+    },
+    "chunk-L3I5JPWZ": {
+      "file": "chunk-L3I5JPWZ.js"
+    },
+    "chunk-CTKWF4NM": {
+      "file": "chunk-CTKWF4NM.js"
+    },
+    "chunk-TYU74FDJ": {
+      "file": "chunk-TYU74FDJ.js"
+    },
+    "chunk-HJ3SAD4Z": {
+      "file": "chunk-HJ3SAD4Z.js"
+    },
+    "chunk-5RWR7C5P": {
+      "file": "chunk-5RWR7C5P.js"
+    },
+    "chunk-YB2OV3US": {
+      "file": "chunk-YB2OV3US.js"
+    },
+    "chunk-2YRX745D": {
+      "file": "chunk-2YRX745D.js"
+    },
+    "chunk-OR4V6S2U": {
+      "file": "chunk-OR4V6S2U.js"
+    },
+    "chunk-JYV5EUUU": {
+      "file": "chunk-JYV5EUUU.js"
+    },
+    "chunk-DAQCNZDC": {
+      "file": "chunk-DAQCNZDC.js"
+    },
+    "chunk-WZM6GV37": {
+      "file": "chunk-WZM6GV37.js"
+    },
+    "chunk-HI5D57IO": {
+      "file": "chunk-HI5D57IO.js"
+    },
+    "chunk-S7FLS6J4": {
+      "file": "chunk-S7FLS6J4.js"
+    },
+    "chunk-VLQF4VVG": {
+      "file": "chunk-VLQF4VVG.js"
+    },
+    "chunk-3IZN45W4": {
+      "file": "chunk-3IZN45W4.js"
+    },
+    "chunk-NBZIJBQN": {
+      "file": "chunk-NBZIJBQN.js"
+    },
+    "chunk-2SNQ3HEF": {
+      "file": "chunk-2SNQ3HEF.js"
+    },
+    "chunk-ESZPSMLU": {
+      "file": "chunk-ESZPSMLU.js"
+    },
+    "chunk-QXJOWFYZ": {
+      "file": "chunk-QXJOWFYZ.js"
+    },
+    "chunk-2ROLPC73": {
+      "file": "chunk-2ROLPC73.js"
+    },
+    "chunk-56R6SLXN": {
+      "file": "chunk-56R6SLXN.js"
+    },
+    "chunk-XPCOJVRL": {
+      "file": "chunk-XPCOJVRL.js"
+    },
+    "chunk-IIRLJDXL": {
+      "file": "chunk-IIRLJDXL.js"
+    },
+    "chunk-M6X33RZV": {
+      "file": "chunk-M6X33RZV.js"
+    },
+    "chunk-SVMC4EBE": {
+      "file": "chunk-SVMC4EBE.js"
+    },
+    "chunk-PIASBTZO": {
+      "file": "chunk-PIASBTZO.js"
+    },
+    "chunk-NSAPKY2D": {
+      "file": "chunk-NSAPKY2D.js"
+    },
+    "chunk-WEEGRZSP": {
+      "file": "chunk-WEEGRZSP.js"
+    },
+    "chunk-U2ZTKOT3": {
+      "file": "chunk-U2ZTKOT3.js"
+    },
+    "chunk-XPTICEO2": {
+      "file": "chunk-XPTICEO2.js"
+    },
+    "chunk-SEACPUNZ": {
+      "file": "chunk-SEACPUNZ.js"
+    },
+    "chunk-5AJSY7TL": {
+      "file": "chunk-5AJSY7TL.js"
+    },
+    "chunk-EFRFZ7OU": {
+      "file": "chunk-EFRFZ7OU.js"
+    },
+    "chunk-P24HYHXQ": {
+      "file": "chunk-P24HYHXQ.js"
+    },
+    "chunk-DSTTD374": {
+      "file": "chunk-DSTTD374.js"
+    }
+  }
+}

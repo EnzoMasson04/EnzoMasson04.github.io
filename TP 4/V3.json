@@ -1,0 +1,779 @@
+[
+    {
+        "id": "cc582cda",
+        "type": "tab",
+        "label": "TP4 - Partie 5 (D2 FIXED v2)",
+        "disabled": false,
+        "info": "Dashboard 2: fixed gauge + CSV columns + ui-page"
+    },
+    {
+        "id": "4d728822",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "JSON.parse()",
+        "func": "try {\n    if (typeof msg.payload === \"string\") { msg.payload = JSON.parse(msg.payload); }\n    return msg;\n} catch(e) {\n    if (!isNaN(Number(msg.payload))) { msg.payload = Number(msg.payload); return msg; }\n    node.warn(\"JSON parse error: \" + e.message);\n    return null;\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 440,
+        "wires": [
+            [
+                "be8e5773",
+                "044240bd",
+                "e605dedb"
+            ]
+        ]
+    },
+    {
+        "id": "6e0cd0a6",
+        "type": "mqtt in",
+        "z": "cc582cda",
+        "name": "light",
+        "topic": "/merakimv/Q2GV-LNY7-QTMZ/light",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4c79ad4b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 220,
+        "wires": [
+            [
+                "4d728822"
+            ]
+        ]
+    },
+    {
+        "id": "be8e5773",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "getLux",
+        "func": "msg.payload = Number(msg.payload.lux);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 220,
+        "wires": [
+            [
+                "0f966611"
+            ]
+        ]
+    },
+    {
+        "id": "0f966611",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "TSLuminosity",
+        "func": "var now = new Date();\nfunction two(n){return (n<10?(\"0\"+n):(\"\"+n));}\nvar date = two(now.getDate())+\"/\"+two(now.getMonth()+1)+\"/\"+now.getFullYear();\nvar heure = two(now.getHours())+\":\"+two(now.getMinutes())+\":\"+two(now.getSeconds());\nvar msg1 = {}, msg2 = {}, temp = {\"date\":date, \"heure\":heure, \"lux\": msg.payload};\nmsg1.payload = temp;\nmsg2.payload = \"Le \" + temp.date + \" à \" + temp.heure + \" lux=\" + temp[\"lux\"];\nreturn [msg1, msg2];\n",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 220,
+        "wires": [
+            [
+                "0b7cebd6",
+                "66eaa1d1"
+            ],
+            [
+                "f43422f3",
+                "fb51dd97"
+            ]
+        ]
+    },
+    {
+        "id": "f43422f3",
+        "type": "ui-text",
+        "z": "cc582cda",
+        "group": "6b0467df",
+        "order": 122,
+        "width": 0,
+        "height": 0,
+        "name": "Le",
+        "label": "Le",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "wrapText": false,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1130,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "0b7cebd6",
+        "type": "csv",
+        "z": "cc582cda",
+        "name": "toCSV Luminosity",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "date,heure,lux",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 1210,
+        "y": 180,
+        "wires": [
+            [
+                "1c505ce4"
+            ]
+        ]
+    },
+    {
+        "id": "1c505ce4",
+        "type": "file",
+        "z": "cc582cda",
+        "name": "Write Luminosity",
+        "filename": "data_luminosity.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 1400,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fb51dd97",
+        "type": "debug",
+        "z": "cc582cda",
+        "name": "debug Luminosity",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1130,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "36734e46",
+        "type": "mqtt in",
+        "z": "cc582cda",
+        "name": "Level",
+        "topic": "BTB_Utilities/Water/Bulk_Tank_1/Level",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4c79ad4b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 420,
+        "wires": [
+            [
+                "4d728822"
+            ]
+        ]
+    },
+    {
+        "id": "044240bd",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "getTankLevel",
+        "func": "msg.payload = Number(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 420,
+        "wires": [
+            [
+                "9ac7a7cb"
+            ]
+        ]
+    },
+    {
+        "id": "9ac7a7cb",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "TSTankLevel",
+        "func": "var now = new Date();\nfunction two(n){return (n<10?(\"0\"+n):(\"\"+n));}\nvar date = two(now.getDate())+\"/\"+two(now.getMonth()+1)+\"/\"+now.getFullYear();\nvar heure = two(now.getHours())+\":\"+two(now.getMinutes())+\":\"+two(now.getSeconds());\nvar msg1 = {}, msg2 = {}, temp = {\"date\":date, \"heure\":heure, \"tankLevel\": msg.payload};\nmsg1.payload = temp;\nmsg2.payload = \"Le \" + temp.date + \" à \" + temp.heure + \" tankLevel=\" + temp[\"tankLevel\"];\nreturn [msg1, msg2];\n",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 420,
+        "wires": [
+            [
+                "82f767d9",
+                "b789fc9a"
+            ],
+            [
+                "1f971a39",
+                "8f9d644b"
+            ]
+        ]
+    },
+    {
+        "id": "1f971a39",
+        "type": "ui-text",
+        "z": "cc582cda",
+        "group": "6b0467df",
+        "order": 142,
+        "width": 0,
+        "height": 0,
+        "name": "Le",
+        "label": "Le",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1070,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "82f767d9",
+        "type": "csv",
+        "z": "cc582cda",
+        "name": "toCSV Tank Level",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "date,heure,tankLevel",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 1150,
+        "y": 380,
+        "wires": [
+            [
+                "431f99cb"
+            ]
+        ]
+    },
+    {
+        "id": "431f99cb",
+        "type": "file",
+        "z": "cc582cda",
+        "name": "Write Tank Level",
+        "filename": "data_tank_level.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 1340,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8f9d644b",
+        "type": "debug",
+        "z": "cc582cda",
+        "name": "debug Tank Level",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1130,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "3603ad54",
+        "type": "mqtt in",
+        "z": "cc582cda",
+        "name": "audio_analytics",
+        "topic": "/merakimv/Q2SV-FM73-WPJM/audio_analytics",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4c79ad4b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 620,
+        "wires": [
+            [
+                "4d728822"
+            ]
+        ]
+    },
+    {
+        "id": "e605dedb",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "getAudioLevel",
+        "func": "msg.payload = { ts: msg.payload.ts, audioLevel: Number(msg.payload.audioLevel) };\nreturn msg;",
+        "outputs": 1,
+        "timeout": "0",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 620,
+        "wires": [
+            [
+                "f82a4765"
+            ]
+        ]
+    },
+    {
+        "id": "f82a4765",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "TSAudioLevel",
+        "func": "var msg1 = {};\nvar msg2 = {};\n\nvar temp = {\n    \"timeStamp\": msg.payload.ts,\n    \"audioLevel\": msg.payload.audioLevel\n};\n\n// Sortie 1 → pour le graphique ou CSV\nmsg1.payload = temp;\n\n// Sortie 2 → pour l’affichage textuel ou debug\nmsg2.payload = \"Le \" + temp.timeStamp + \" audioLevel = \" + temp.audioLevel;\n\nreturn [msg1, msg2];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 620,
+        "wires": [
+            [
+                "695dce5a",
+                "65b4fd12"
+            ],
+            [
+                "17d838f0",
+                "7f338c03"
+            ]
+        ]
+    },
+    {
+        "id": "17d838f0",
+        "type": "ui-text",
+        "z": "cc582cda",
+        "group": "6b0467df",
+        "order": 162,
+        "width": 0,
+        "height": 0,
+        "name": "Le",
+        "label": "Le",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1110,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "695dce5a",
+        "type": "csv",
+        "z": "cc582cda",
+        "name": "toCSV AudioLevel",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timeStamp,audioLevel",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 1150,
+        "y": 580,
+        "wires": [
+            [
+                "8fe1220f"
+            ]
+        ]
+    },
+    {
+        "id": "8fe1220f",
+        "type": "file",
+        "z": "cc582cda",
+        "name": "Write AudioLevel",
+        "filename": "data_audiolevel.csv",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 1350,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7f338c03",
+        "type": "debug",
+        "z": "cc582cda",
+        "name": "debug AudioLevel",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1170,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "839ef191",
+        "type": "ui-chart",
+        "z": "cc582cda",
+        "group": "6b0467df",
+        "name": "Luminosity",
+        "label": "Luminosity",
+        "order": 10,
+        "chartType": "line",
+        "category": "payload",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "",
+        "yAxisPropertyType": "property",
+        "ymin": "",
+        "ymax": "",
+        "bins": "",
+        "stackSeries": false,
+        "pointRadius": "",
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "4",
+        "height": "4",
+        "className": "",
+        "interpolation": "linear",
+        "x": 1410,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e399a288",
+        "type": "ui-gauge",
+        "z": "cc582cda",
+        "name": "Tank Level",
+        "group": "6b0467df",
+        "order": 20,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "3",
+        "height": "3",
+        "title": "Tank Level",
+        "alwaysShowTitle": false,
+        "units": "",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [],
+        "min": 0,
+        "max": "1000",
+        "sizeThickness": "",
+        "sizeGap": "",
+        "sizeKeyThickness": "",
+        "className": "",
+        "x": 1190,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "11877d60",
+        "type": "ui-chart",
+        "z": "cc582cda",
+        "group": "6b0467df",
+        "name": "AudioLevel",
+        "label": "AudioLevel",
+        "order": 30,
+        "chartType": "line",
+        "category": "payload.audioLevel",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "",
+        "yAxisPropertyType": "property",
+        "ymin": "",
+        "ymax": "",
+        "bins": "",
+        "stackSeries": false,
+        "pointRadius": "",
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "4",
+        "height": "4",
+        "className": "",
+        "interpolation": "linear",
+        "x": 1310,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "66eaa1d1",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "Value only (Lux)",
+        "func": "if (msg.payload && msg.payload['lux'] !== undefined) msg.payload = msg.payload['lux'];\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1240,
+        "y": 140,
+        "wires": [
+            [
+                "839ef191"
+            ]
+        ]
+    },
+    {
+        "id": "b789fc9a",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "Value only (Tank)",
+        "func": "if (msg.payload && msg.payload['tankLevel'] !== undefined) msg.payload = msg.payload['tankLevel'];\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 340,
+        "wires": [
+            [
+                "e399a288"
+            ]
+        ]
+    },
+    {
+        "id": "65b4fd12",
+        "type": "function",
+        "z": "cc582cda",
+        "name": "Value only (Audio)",
+        "func": "if (msg.payload && msg.payload['audioLevel'] !== undefined) msg.payload = msg.payload['audioLevel'];\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1110,
+        "y": 540,
+        "wires": [
+            [
+                "11877d60"
+            ]
+        ]
+    },
+    {
+        "id": "4c79ad4b",
+        "type": "mqtt-broker",
+        "name": "test.mosquitto.org",
+        "broker": "test.mosquitto.org",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "6b0467df",
+        "type": "ui-group",
+        "z": "cc582cda",
+        "name": "Le groupe",
+        "page": "d4b6ec95",
+        "width": "6",
+        "order": 1
+    },
+    {
+        "id": "d4b6ec95",
+        "type": "ui-page",
+        "z": "cc582cda",
+        "name": "Test",
+        "ui": "f746718a91ceec7b",
+        "path": "",
+        "icon": "dashboard",
+        "layout": "grid",
+        "theme": "d69d346b88964410",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "f746718a91ceec7b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "d69d346b88964410",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "a18bd13eb9b00461",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.29.0"
+        }
+    }
+]

@@ -1,0 +1,378 @@
+[
+  {
+    "id": "01fe39fc",
+    "type": "tab",
+    "label": "TP4 - Partie 5 (D2 SIMPLE)",
+    "disabled": false,
+    "info": "3 MQTT -> 3 functions -> UI + CSV + debug"
+  },
+  {
+    "id": "6d1c4981",
+    "type": "ui-page",
+    "z": "01fe39fc",
+    "name": "Test",
+    "icon": "dashboard",
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "134b6874",
+    "type": "ui-group",
+    "z": "01fe39fc",
+    "name": "Le groupe",
+    "page": "6d1c4981",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "ff9978b9",
+    "type": "mqtt-broker",
+    "name": "test.mosquitto.org",
+    "broker": "test.mosquitto.org",
+    "port": "1883",
+    "clientid": "",
+    "usetls": false,
+    "tls": "",
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true
+  },
+  {
+    "id": "c42110df",
+    "z": "01fe39fc",
+    "type": "mqtt in",
+    "name": "light",
+    "topic": "/merakimv/Q2EV-M982-WW24/light",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "ff9978b9",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "x": 150,
+    "y": 160,
+    "wires": [
+      [
+        "faecb7bb"
+      ]
+    ]
+  },
+  {
+    "id": "c39d1473",
+    "z": "01fe39fc",
+    "type": "mqtt in",
+    "name": "tank level",
+    "topic": "r545_roof_water_tank_12/level",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "ff9978b9",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "x": 150,
+    "y": 300,
+    "wires": [
+      [
+        "3a8d95c8"
+      ]
+    ]
+  },
+  {
+    "id": "462fbd5a",
+    "z": "01fe39fc",
+    "type": "mqtt in",
+    "name": "audio_analytics",
+    "topic": "/merakimv/Q2SV-FM73-WPJM/audio_analytics",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "ff9978b9",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "x": 150,
+    "y": 440,
+    "wires": [
+      [
+        "500a0fbc"
+      ]
+    ]
+  },
+  {
+    "id": "faecb7bb",
+    "z": "01fe39fc",
+    "type": "function",
+    "name": "Lux -> out(num, obj)",
+    "func": "if (typeof msg.payload === \"string\") { try { msg.payload = JSON.parse(msg.payload); } catch(e){} }\nvar lux = Number(msg.payload.lux);\nif (isNaN(lux)) return null;\nvar now = new Date(); function two(n){return n<10?(\"0\"+n):(\"\"+n);}\nvar obj = { date: two(now.getDate())+\"/\"+two(now.getMonth()+1)+\"/\"+now.getFullYear(),\n            heure: two(now.getHours())+\":\"+two(now.getMinutes())+\":\"+two(now.getSeconds()),\n            lux: lux };\nreturn [{payload: lux}, {payload: obj}];\n",
+    "outputs": 2,
+    "noerr": 0,
+    "x": 420,
+    "y": 160,
+    "wires": [
+      [
+        "eb790f6b",
+        "2fcb16e8"
+      ],
+      [
+        "ababece7"
+      ]
+    ]
+  },
+  {
+    "id": "3a8d95c8",
+    "z": "01fe39fc",
+    "type": "function",
+    "name": "Tank -> out(num, obj)",
+    "func": "var level = Number(msg.payload);\nif (isNaN(level) && typeof msg.payload === \"string\") { try { level = Number(JSON.parse(msg.payload)); } catch(e){} }\nif (isNaN(level)) return null;\nvar now = new Date(); function two(n){return n<10?(\"0\"+n):(\"\"+n);}\nvar obj = { date: two(now.getDate())+\"/\"+two(now.getMonth()+1)+\"/\"+now.getFullYear(),\n            heure: two(now.getHours())+\":\"+two(now.getMinutes())+\":\"+two(now.getSeconds()),\n            tankLevel: level };\nreturn [{payload: level}, {payload: obj}];\n",
+    "outputs": 2,
+    "noerr": 0,
+    "x": 420,
+    "y": 300,
+    "wires": [
+      [
+        "517866de",
+        "87a102f0"
+      ],
+      [
+        "1df6e075"
+      ]
+    ]
+  },
+  {
+    "id": "500a0fbc",
+    "z": "01fe39fc",
+    "type": "function",
+    "name": "Audio -> out(num, obj)",
+    "func": "if (typeof msg.payload === \"string\") { try { msg.payload = JSON.parse(msg.payload); } catch(e){} }\nvar ts = msg.payload.ts || msg.payload.timeStamp || \"\";\nvar audio = Number(msg.payload.audioLevel);\nif (isNaN(audio)) return null;\nvar obj = { timeStamp: ts, audioLevel: audio };\nreturn [{payload: audio}, {payload: obj}];\n",
+    "outputs": 2,
+    "noerr": 0,
+    "x": 420,
+    "y": 440,
+    "wires": [
+      [
+        "c7aa0278",
+        "0f54cd71"
+      ],
+      [
+        "f3a5a62c"
+      ]
+    ]
+  },
+  {
+    "id": "eb790f6b",
+    "z": "01fe39fc",
+    "type": "ui-chart",
+    "name": "Luminosity",
+    "group": "134b6874",
+    "order": 10,
+    "width": 0,
+    "height": 0,
+    "label": "Luminosity",
+    "chartType": "line",
+    "legend": false,
+    "xformat": "HH:mm:ss",
+    "interpolate": "linear",
+    "nodata": "No data",
+    "removeOlder": 1,
+    "removeOlderUnit": "3600",
+    "x": 760,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "517866de",
+    "z": "01fe39fc",
+    "type": "ui-gauge",
+    "name": "Tank Level",
+    "group": "134b6874",
+    "order": 20,
+    "width": 0,
+    "height": 0,
+    "title": "Tank Level",
+    "label": "",
+    "format": "{{value}}",
+    "min": 0,
+    "max": 100,
+    "x": 760,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "c7aa0278",
+    "z": "01fe39fc",
+    "type": "ui-chart",
+    "name": "AudioLevel",
+    "group": "134b6874",
+    "order": 30,
+    "width": 0,
+    "height": 0,
+    "label": "AudioLevel",
+    "chartType": "line",
+    "legend": false,
+    "xformat": "HH:mm:ss",
+    "interpolate": "linear",
+    "nodata": "No data",
+    "removeOlder": 1,
+    "removeOlderUnit": "3600",
+    "x": 760,
+    "y": 440,
+    "wires": []
+  },
+  {
+    "id": "2fcb16e8",
+    "z": "01fe39fc",
+    "type": "debug",
+    "name": "debug Lux",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 760,
+    "y": 200,
+    "wires": []
+  },
+  {
+    "id": "87a102f0",
+    "z": "01fe39fc",
+    "type": "debug",
+    "name": "debug Tank",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 760,
+    "y": 340,
+    "wires": []
+  },
+  {
+    "id": "0f54cd71",
+    "z": "01fe39fc",
+    "type": "debug",
+    "name": "debug Audio",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 760,
+    "y": 480,
+    "wires": []
+  },
+  {
+    "id": "ababece7",
+    "z": "01fe39fc",
+    "type": "csv",
+    "name": "toCSV Lux",
+    "sep": ";",
+    "hdrin": "",
+    "hdrout": "once",
+    "multi": "one",
+    "ret": "\\n",
+    "temp": "date,heure,lux",
+    "skip": "0",
+    "strings": true,
+    "include_empty_strings": "",
+    "include_null_values": "",
+    "x": 760,
+    "y": 240,
+    "wires": [
+      [
+        "e7c17c09"
+      ]
+    ]
+  },
+  {
+    "id": "e7c17c09",
+    "z": "01fe39fc",
+    "type": "file",
+    "name": "Write Lux",
+    "filename": "data_luminosity.csv",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 960,
+    "y": 240,
+    "wires": []
+  },
+  {
+    "id": "1df6e075",
+    "z": "01fe39fc",
+    "type": "csv",
+    "name": "toCSV Tank",
+    "sep": ";",
+    "hdrin": "",
+    "hdrout": "once",
+    "multi": "one",
+    "ret": "\\n",
+    "temp": "date,heure,tankLevel",
+    "skip": "0",
+    "strings": true,
+    "include_empty_strings": "",
+    "include_null_values": "",
+    "x": 760,
+    "y": 380,
+    "wires": [
+      [
+        "1d9923aa"
+      ]
+    ]
+  },
+  {
+    "id": "1d9923aa",
+    "z": "01fe39fc",
+    "type": "file",
+    "name": "Write Tank",
+    "filename": "data_tank_level.csv",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 960,
+    "y": 380,
+    "wires": []
+  },
+  {
+    "id": "f3a5a62c",
+    "z": "01fe39fc",
+    "type": "csv",
+    "name": "toCSV Audio",
+    "sep": ";",
+    "hdrin": "",
+    "hdrout": "once",
+    "multi": "one",
+    "ret": "\\n",
+    "temp": "timeStamp,audioLevel",
+    "skip": "0",
+    "strings": true,
+    "include_empty_strings": "",
+    "include_null_values": "",
+    "x": 760,
+    "y": 520,
+    "wires": [
+      [
+        "e87543dc"
+      ]
+    ]
+  },
+  {
+    "id": "e87543dc",
+    "z": "01fe39fc",
+    "type": "file",
+    "name": "Write Audio",
+    "filename": "data_audiolevel.csv",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 960,
+    "y": 520,
+    "wires": []
+  }
+]

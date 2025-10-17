@@ -1,0 +1,586 @@
+[
+    {
+        "id": "01fe39fc",
+        "type": "tab",
+        "label": "TP4 - Partie 5 (D2 SIMPLE)",
+        "disabled": false,
+        "info": "3 MQTT -> 3 functions -> UI + CSV + debug"
+    },
+    {
+        "id": "c42110df",
+        "type": "mqtt in",
+        "z": "01fe39fc",
+        "name": "light",
+        "topic": "/merakimv/Q2GV-LNY7-QTMZ/light",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "ff9978b9",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 160,
+        "wires": [
+            [
+                "faecb7bb"
+            ]
+        ]
+    },
+    {
+        "id": "c39d1473",
+        "type": "mqtt in",
+        "z": "01fe39fc",
+        "name": "tank level",
+        "topic": "BTB_Utilities/Water/Bulk_Tank_1/Level",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "ff9978b9",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 300,
+        "wires": [
+            [
+                "3a8d95c8"
+            ]
+        ]
+    },
+    {
+        "id": "462fbd5a",
+        "type": "mqtt in",
+        "z": "01fe39fc",
+        "name": "audio_analytics",
+        "topic": "/merakimv/Q2GV-NEKZ-84HU/audio_analytics",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "ff9978b9",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 440,
+        "wires": [
+            [
+                "500a0fbc"
+            ]
+        ]
+    },
+    {
+        "id": "faecb7bb",
+        "type": "function",
+        "z": "01fe39fc",
+        "name": "Lux -> out(num, obj)",
+        "func": "if (typeof msg.payload === \"string\") { try { msg.payload = JSON.parse(msg.payload); } catch(e){} }\nvar lux = Number(msg.payload.lux);\nif (isNaN(lux)) return null;\nvar now = new Date(); function two(n){return n<10?(\"0\"+n):(\"\"+n);}\nvar obj = { date: two(now.getDate())+\"/\"+two(now.getMonth()+1)+\"/\"+now.getFullYear(),\n            heure: two(now.getHours())+\":\"+two(now.getMinutes())+\":\"+two(now.getSeconds()),\n            lux: lux };\nreturn [{payload: lux}, {payload: obj}];\n",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 160,
+        "wires": [
+            [
+                "eb790f6b",
+                "2fcb16e8"
+            ],
+            [
+                "ababece7"
+            ]
+        ]
+    },
+    {
+        "id": "3a8d95c8",
+        "type": "function",
+        "z": "01fe39fc",
+        "name": "Tank -> out(num, obj)",
+        "func": "var level = Number(msg.payload);\nif (isNaN(level) && typeof msg.payload === \"string\") { try { level = Number(JSON.parse(msg.payload)); } catch(e){} }\nif (isNaN(level)) return null;\nvar now = new Date(); function two(n){return n<10?(\"0\"+n):(\"\"+n);}\nvar obj = { date: two(now.getDate())+\"/\"+two(now.getMonth()+1)+\"/\"+now.getFullYear(),\n            heure: two(now.getHours())+\":\"+two(now.getMinutes())+\":\"+two(now.getSeconds()),\n            tankLevel: level };\nreturn [{payload: level}, {payload: obj}];\n",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 300,
+        "wires": [
+            [
+                "517866de",
+                "87a102f0"
+            ],
+            [
+                "1df6e075"
+            ]
+        ]
+    },
+    {
+        "id": "500a0fbc",
+        "type": "function",
+        "z": "01fe39fc",
+        "name": "Audio -> out(num, obj)",
+        "func": "if (typeof msg.payload === \"string\") { try { msg.payload = JSON.parse(msg.payload); } catch(e){} }\nvar ts = msg.payload.ts || msg.payload.timeStamp || \"\";\nvar audio = Number(msg.payload.audioLevel);\nif (isNaN(audio)) return null;\nvar obj = { timeStamp: ts, audioLevel: audio };\nreturn [{payload: audio}, {payload: obj}];\n",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 440,
+        "wires": [
+            [
+                "c7aa0278",
+                "0f54cd71"
+            ],
+            [
+                "f3a5a62c"
+            ]
+        ]
+    },
+    {
+        "id": "eb790f6b",
+        "type": "ui-chart",
+        "z": "01fe39fc",
+        "group": "134b6874",
+        "name": "Luminosity",
+        "label": "Luminosity",
+        "order": 10,
+        "chartType": "line",
+        "category": "payload",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "",
+        "yAxisPropertyType": "property",
+        "ymin": "",
+        "ymax": "",
+        "bins": "",
+        "stackSeries": false,
+        "pointShape": "line",
+        "pointRadius": "",
+        "showLegend": false,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "6",
+        "height": "5",
+        "className": "",
+        "interpolation": "smooth",
+        "x": 760,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "517866de",
+        "type": "ui-gauge",
+        "z": "01fe39fc",
+        "name": "Tank Level",
+        "group": "134b6874",
+        "order": 20,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "3",
+        "height": "3",
+        "gtype": "gauge-34",
+        "gstyle": "rounded",
+        "title": "Tank Level",
+        "alwaysShowTitle": false,
+        "units": "",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "400",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "450",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "500",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": "400",
+        "max": "600",
+        "sizeThickness": "20",
+        "sizeGap": "",
+        "sizeKeyThickness": "",
+        "className": "",
+        "x": 760,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c7aa0278",
+        "type": "ui-chart",
+        "z": "01fe39fc",
+        "group": "134b6874",
+        "name": "AudioLevel",
+        "label": "AudioLevel",
+        "order": 30,
+        "chartType": "line",
+        "category": "payload.obj",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": "",
+        "stackSeries": false,
+        "pointRadius": "",
+        "showLegend": false,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "6",
+        "height": "5",
+        "className": "",
+        "interpolation": "linear",
+        "x": 760,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2fcb16e8",
+        "type": "debug",
+        "z": "01fe39fc",
+        "name": "debug Lux",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "87a102f0",
+        "type": "debug",
+        "z": "01fe39fc",
+        "name": "debug Tank",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 760,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "0f54cd71",
+        "type": "debug",
+        "z": "01fe39fc",
+        "name": "debug Audio",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 760,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "ababece7",
+        "type": "csv",
+        "z": "01fe39fc",
+        "name": "toCSV Lux",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "date,heure,lux",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 760,
+        "y": 240,
+        "wires": [
+            [
+                "e7c17c09"
+            ]
+        ]
+    },
+    {
+        "id": "e7c17c09",
+        "type": "file",
+        "z": "01fe39fc",
+        "name": "Write Lux",
+        "filename": "data_luminosity.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 960,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1df6e075",
+        "type": "csv",
+        "z": "01fe39fc",
+        "name": "toCSV Tank",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "date,heure,tankLevel",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 760,
+        "y": 380,
+        "wires": [
+            [
+                "1d9923aa"
+            ]
+        ]
+    },
+    {
+        "id": "1d9923aa",
+        "type": "file",
+        "z": "01fe39fc",
+        "name": "Write Tank",
+        "filename": "data_tank_level.csv",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 960,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f3a5a62c",
+        "type": "csv",
+        "z": "01fe39fc",
+        "name": "toCSV Audio",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timeStamp,audioLevel",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 760,
+        "y": 520,
+        "wires": [
+            [
+                "e87543dc"
+            ]
+        ]
+    },
+    {
+        "id": "e87543dc",
+        "type": "file",
+        "z": "01fe39fc",
+        "name": "Write Audio",
+        "filename": "data_audiolevel.csv",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 960,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ff9978b9",
+        "type": "mqtt-broker",
+        "name": "test.mosquitto.org",
+        "broker": "test.mosquitto.org",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true
+    },
+    {
+        "id": "134b6874",
+        "type": "ui-group",
+        "z": "01fe39fc",
+        "name": "Le groupe",
+        "page": "6d1c4981",
+        "width": "6",
+        "order": 1
+    },
+    {
+        "id": "6d1c4981",
+        "type": "ui-page",
+        "z": "01fe39fc",
+        "name": "Test",
+        "ui": "f746718a91ceec7b",
+        "path": "",
+        "icon": "dashboard",
+        "layout": "grid",
+        "theme": "d69d346b88964410",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "f746718a91ceec7b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "d69d346b88964410",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "ab722276779ae00c",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.29.0"
+        }
+    }
+]

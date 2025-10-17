@@ -1,0 +1,556 @@
+[
+  {
+    "id": "cc582cda",
+    "type": "tab",
+    "label": "TP4 - Partie 5 (D2 FIXED v2)",
+    "disabled": false,
+    "info": "Dashboard 2: fixed gauge + CSV columns + ui-page"
+  },
+  {
+    "id": "d4b6ec95",
+    "type": "ui-page",
+    "z": "cc582cda",
+    "name": "Test",
+    "icon": "dashboard",
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "6b0467df",
+    "type": "ui-group",
+    "z": "cc582cda",
+    "name": "Le groupe",
+    "page": "d4b6ec95",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "4c79ad4b",
+    "type": "mqtt-broker",
+    "name": "test.mosquitto.org",
+    "broker": "test.mosquitto.org",
+    "port": "1883",
+    "clientid": "",
+    "usetls": false,
+    "tls": "",
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": "",
+    "willMsg": {},
+    "sessionExpiry": ""
+  },
+  {
+    "id": "4d728822",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "JSON.parse()",
+    "func": "try {\n    if (typeof msg.payload === \"string\") { msg.payload = JSON.parse(msg.payload); }\n    return msg;\n} catch(e) {\n    if (!isNaN(Number(msg.payload))) { msg.payload = Number(msg.payload); return msg; }\n    node.warn(\"JSON parse error: \" + e.message);\n    return null;\n}\n",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 470,
+    "y": 120,
+    "wires": [
+      [
+        "be8e5773",
+        "044240bd",
+        "e605dedb"
+      ]
+    ]
+  },
+  {
+    "id": "6e0cd0a6",
+    "z": "cc582cda",
+    "type": "mqtt in",
+    "name": "light",
+    "topic": "/merakimv/Q2GV-LNY7-QTMZ/light",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "4c79ad4b",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "x": 150,
+    "y": 220,
+    "wires": [
+      [
+        "4d728822"
+      ]
+    ]
+  },
+  {
+    "id": "be8e5773",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "getLux",
+    "func": "msg.payload = Number(msg.payload.lux); return msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 680,
+    "y": 220,
+    "wires": [
+      [
+        "0f966611"
+      ]
+    ]
+  },
+  {
+    "id": "0f966611",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "TSLuminosity",
+    "func": "var now = new Date();\nfunction two(n){return (n<10?(\"0\"+n):(\"\"+n));}\nvar date = two(now.getDate())+\"/\"+two(now.getMonth()+1)+\"/\"+now.getFullYear();\nvar heure = two(now.getHours())+\":\"+two(now.getMinutes())+\":\"+two(now.getSeconds());\nvar msg1 = {}, msg2 = {}, temp = {\"date\":date, \"heure\":heure, \"lux\": msg.payload};\nmsg1.payload = temp;\nmsg2.payload = \"Le \" + temp.date + \" à \" + temp.heure + \" lux=\" + temp[\"lux\"];\nreturn [msg1, msg2];\n",
+    "outputs": 2,
+    "noerr": 0,
+    "x": 900,
+    "y": 220,
+    "wires": [
+      [
+        "0b7cebd6",
+        "66eaa1d1"
+      ],
+      [
+        "f43422f3",
+        "fb51dd97"
+      ]
+    ]
+  },
+  {
+    "id": "f43422f3",
+    "z": "cc582cda",
+    "type": "ui-text",
+    "group": "6b0467df",
+    "order": 122,
+    "width": 0,
+    "height": 0,
+    "name": "Le",
+    "label": "Le",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "x": 1130,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "0b7cebd6",
+    "z": "cc582cda",
+    "type": "csv",
+    "name": "toCSV Luminosity",
+    "sep": ";",
+    "hdrin": "",
+    "hdrout": "once",
+    "multi": "one",
+    "ret": "\\n",
+    "temp": "date,heure,lux",
+    "skip": "0",
+    "strings": true,
+    "include_empty_strings": "",
+    "include_null_values": "",
+    "x": 1130,
+    "y": 260,
+    "wires": [
+      [
+        "1c505ce4"
+      ]
+    ]
+  },
+  {
+    "id": "1c505ce4",
+    "z": "cc582cda",
+    "type": "file",
+    "name": "Write Luminosity",
+    "filename": "data_luminosity.csv",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 1330,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "fb51dd97",
+    "z": "cc582cda",
+    "type": "debug",
+    "name": "debug Luminosity",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 1330,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "36734e46",
+    "z": "cc582cda",
+    "type": "mqtt in",
+    "name": "Level",
+    "topic": "BTB_Utilities/Water/Bulk_Tank_1/Level",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "4c79ad4b",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "x": 150,
+    "y": 420,
+    "wires": [
+      [
+        "4d728822"
+      ]
+    ]
+  },
+  {
+    "id": "044240bd",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "getTankLevel",
+    "func": "msg.payload = Number(msg.payload); return msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 680,
+    "y": 420,
+    "wires": [
+      [
+        "9ac7a7cb"
+      ]
+    ]
+  },
+  {
+    "id": "9ac7a7cb",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "TSTankLevel",
+    "func": "var now = new Date();\nfunction two(n){return (n<10?(\"0\"+n):(\"\"+n));}\nvar date = two(now.getDate())+\"/\"+two(now.getMonth()+1)+\"/\"+now.getFullYear();\nvar heure = two(now.getHours())+\":\"+two(now.getMinutes())+\":\"+two(now.getSeconds());\nvar msg1 = {}, msg2 = {}, temp = {\"date\":date, \"heure\":heure, \"tankLevel\": msg.payload};\nmsg1.payload = temp;\nmsg2.payload = \"Le \" + temp.date + \" à \" + temp.heure + \" tankLevel=\" + temp[\"tankLevel\"];\nreturn [msg1, msg2];\n",
+    "outputs": 2,
+    "noerr": 0,
+    "x": 900,
+    "y": 420,
+    "wires": [
+      [
+        "82f767d9",
+        "b789fc9a"
+      ],
+      [
+        "1f971a39",
+        "8f9d644b"
+      ]
+    ]
+  },
+  {
+    "id": "1f971a39",
+    "z": "cc582cda",
+    "type": "ui-text",
+    "group": "6b0467df",
+    "order": 142,
+    "width": 0,
+    "height": 0,
+    "name": "Le",
+    "label": "Le",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "x": 1130,
+    "y": 380,
+    "wires": []
+  },
+  {
+    "id": "82f767d9",
+    "z": "cc582cda",
+    "type": "csv",
+    "name": "toCSV Tank Level",
+    "sep": ";",
+    "hdrin": "",
+    "hdrout": "once",
+    "multi": "one",
+    "ret": "\\n",
+    "temp": "date,heure,tankLevel",
+    "skip": "0",
+    "strings": true,
+    "include_empty_strings": "",
+    "include_null_values": "",
+    "x": 1130,
+    "y": 460,
+    "wires": [
+      [
+        "431f99cb"
+      ]
+    ]
+  },
+  {
+    "id": "431f99cb",
+    "z": "cc582cda",
+    "type": "file",
+    "name": "Write Tank Level",
+    "filename": "data_tank_level.csv",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 1330,
+    "y": 460,
+    "wires": []
+  },
+  {
+    "id": "8f9d644b",
+    "z": "cc582cda",
+    "type": "debug",
+    "name": "debug Tank Level",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 1330,
+    "y": 380,
+    "wires": []
+  },
+  {
+    "id": "3603ad54",
+    "z": "cc582cda",
+    "type": "mqtt in",
+    "name": "audio_analytics",
+    "topic": "/merakimv/Q2SV-FM73-WPJM/audio_analytics",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "4c79ad4b",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "x": 150,
+    "y": 620,
+    "wires": [
+      [
+        "4d728822"
+      ]
+    ]
+  },
+  {
+    "id": "e605dedb",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "getAudioLevel",
+    "func": "msg.payload = { ts: msg.payload.ts, audioLevel: Number(msg.payload.audioLevel) }; return msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 680,
+    "y": 620,
+    "wires": [
+      [
+        "f82a4765"
+      ]
+    ]
+  },
+  {
+    "id": "f82a4765",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "TSAudioLevel",
+    "func": "var msg1 = {}; var msg2 = {};\nvar temp = {\"timeStamp\": msg.payload.ts, \"audioLevel\": msg.payload.audioLevel};\nmsg1.payload = temp;\nmsg2.payload = \"Le \" + temp.timeStamp + \" audioLevel=\" + temp.audioLevel;\nreturn [msg1, msg2];\n",
+    "outputs": 2,
+    "noerr": 0,
+    "x": 900,
+    "y": 620,
+    "wires": [
+      [
+        "695dce5a",
+        "65b4fd12"
+      ],
+      [
+        "17d838f0",
+        "7f338c03"
+      ]
+    ]
+  },
+  {
+    "id": "17d838f0",
+    "z": "cc582cda",
+    "type": "ui-text",
+    "group": "6b0467df",
+    "order": 162,
+    "width": 0,
+    "height": 0,
+    "name": "Le",
+    "label": "Le",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "x": 1130,
+    "y": 580,
+    "wires": []
+  },
+  {
+    "id": "695dce5a",
+    "z": "cc582cda",
+    "type": "csv",
+    "name": "toCSV AudioLevel",
+    "sep": ";",
+    "hdrin": "",
+    "hdrout": "once",
+    "multi": "one",
+    "ret": "\\n",
+    "temp": "timeStamp,audioLevel",
+    "skip": "0",
+    "strings": true,
+    "include_empty_strings": "",
+    "include_null_values": "",
+    "x": 1130,
+    "y": 660,
+    "wires": [
+      [
+        "8fe1220f"
+      ]
+    ]
+  },
+  {
+    "id": "8fe1220f",
+    "z": "cc582cda",
+    "type": "file",
+    "name": "Write AudioLevel",
+    "filename": "data_audiolevel.csv",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 1330,
+    "y": 660,
+    "wires": []
+  },
+  {
+    "id": "7f338c03",
+    "z": "cc582cda",
+    "type": "debug",
+    "name": "debug AudioLevel",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 1330,
+    "y": 580,
+    "wires": []
+  },
+  {
+    "id": "839ef191",
+    "z": "cc582cda",
+    "type": "ui-chart",
+    "name": "Luminosity",
+    "group": "6b0467df",
+    "order": 10,
+    "width": 0,
+    "height": 0,
+    "label": "Luminosity",
+    "chartType": "line",
+    "legend": false,
+    "xformat": "HH:mm:ss",
+    "interpolate": "linear",
+    "nodata": "Aucune donnée",
+    "removeOlder": 1,
+    "removeOlderUnit": "3600",
+    "x": 1130,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "e399a288",
+    "z": "cc582cda",
+    "type": "ui-gauge",
+    "name": "Tank Level",
+    "group": "6b0467df",
+    "order": 20,
+    "width": 0,
+    "height": 0,
+    "title": "Tank Level",
+    "label": "",
+    "format": "{{value}}",
+    "min": 0,
+    "max": 100,
+    "x": 1130,
+    "y": 460,
+    "wires": []
+  },
+  {
+    "id": "11877d60",
+    "z": "cc582cda",
+    "type": "ui-chart",
+    "name": "AudioLevel",
+    "group": "6b0467df",
+    "order": 30,
+    "width": 0,
+    "height": 0,
+    "label": "AudioLevel",
+    "chartType": "line",
+    "legend": false,
+    "xformat": "HH:mm:ss",
+    "interpolate": "linear",
+    "nodata": "Aucune donnée",
+    "removeOlder": 1,
+    "removeOlderUnit": "3600",
+    "x": 1130,
+    "y": 660,
+    "wires": []
+  },
+  {
+    "id": "66eaa1d1",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "Value only (Lux)",
+    "func": "if (msg.payload && msg.payload['lux'] !== undefined) msg.payload = msg.payload['lux']; return msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 1000,
+    "y": 260,
+    "wires": [
+      [
+        "839ef191"
+      ]
+    ]
+  },
+  {
+    "id": "b789fc9a",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "Value only (Tank)",
+    "func": "if (msg.payload && msg.payload['tankLevel'] !== undefined) msg.payload = msg.payload['tankLevel']; return msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 1000,
+    "y": 460,
+    "wires": [
+      [
+        "e399a288"
+      ]
+    ]
+  },
+  {
+    "id": "65b4fd12",
+    "z": "cc582cda",
+    "type": "function",
+    "name": "Value only (Audio)",
+    "func": "if (msg.payload && msg.payload['audioLevel'] !== undefined) msg.payload = msg.payload['audioLevel']; return msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 1000,
+    "y": 660,
+    "wires": [
+      [
+        "11877d60"
+      ]
+    ]
+  }
+]
